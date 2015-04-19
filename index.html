@@ -1,29 +1,17 @@
-<!DOCTYPE html>
 <html>
+
 <head>
-  <title> ISPC Profiler </title>
-
-  <!-- highlight.js -->
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/styles/default.min.css">
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
-
-  <link rel="stylesheet" href="css/code.css">
+  <title>ISPC Visualizer</title>
 </head>
 
 <body>
-  <pre style="width:50%;">
-    <code class="cpp">
-<cline onclick="alert(1);">void foo()</cline>
-<cline onclick="alert(2);">{</cline>
-  int a = 0;
-  if (a &lt;= 0)
-    printf("Hello World!\n");
-}
-    </code>
-  </pre>
-
-  <script>hljs.initHighlightingOnLoad();</script>
-
+  <form action="visualize.php" method="post" enctype="multipart/form-data">
+    Select your source code: 
+    <input type="file" name="code">
+    Select your ISPC profile data:
+    <input type="file" name="profile">
+    <input type="submit" value="Upload" name="submit">
+  </form>
 </body>
 
 </html>
