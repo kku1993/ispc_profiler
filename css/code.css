@@ -1,0 +1,11 @@
+/* New tag for each line in the code block. */
+cline {
+  display:inline;
+  margin:0;
+  padding:0;
+  border:0;
+}
+
+cline:hover {
+  background-color: yellow;
+}
