@@ -28,7 +28,7 @@
     // TODO ensure no 2 user's code could clash
     $date = date_create();
     // $base_name = basename($f["name"]);
-    $file_name = "code_" . date_timestamp_get($date);
+    $file_name = date_timestamp_get($date);
     $target_file = $target_dir."/".$file_name;
     $imageFileType = pathinfo($target_file, PATHINFO_EXTENSION);
 
@@ -53,10 +53,18 @@
     }
   }
 
+  // File name of the uploaded code and profile files
+  $code_name = basename($code_path);
+  $profile_name = basename($profile_path);
+
   // Call python script to format code for display
   $formatted_code = shell_exec("./format_code.py " . $code_path);
 ?>
 
+  <!-- iframe to display stats -->
+  <iframe id='profile_frame' src='profile.php' width='50%' height='100%' style='border:none; float:right;' ></iframe>
+
+  <!-- Display source code -->
   <pre style="width:50%;">
     <code class="cpp">
 <?php
@@ -66,6 +74,19 @@ echo $formatted_code;
   </pre>
 
   <script>hljs.initHighlightingOnLoad();</script>
+
+  <script type="text/javascript">
+    // Handler for when the user clicks on a line.
+    function clickedLine(lineNum) {
+      // TODO use real task, end line number
+<?php
+  echo "var profile_name = \"{$profile_name}\";\n";
+?>
+      var url = "profile.php?task=1&end=10000&start=" + lineNum.toString() + 
+          "&file=" + profile_name;
+      document.getElementById('profile_frame').src = url;
+    }
+  </script>
 
 </body>
 
