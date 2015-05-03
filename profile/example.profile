@@ -1,55 +1,10 @@
-{
-  "task1": {
-    "1": {
-      "lane": [0, 1, 0, 1],
-      "cache_hit": 90,
-      "cache_miss": 40,
-      "type": 1
-    },
-    "2": {
-      "lane": [1, 1, 1, 1],
-      "cache_hit": 90,
-      "cache_miss": 40,
-      "type": 2
-    },
-    "3": {
-      "lane": [1, 1, 1, 1],
-      "cache_hit": 90,
-      "cache_miss": 40,
-      "type": 2
-    },
-    "4": {
-      "lane": [1, 1, 1, 1],
-      "cache_hit": 90,
-      "cache_miss": 40,
-      "type": 2
-    },
-    "5": {
-      "lane": [1, 1, 1, 1],
-      "cache_hit": 90,
-      "cache_miss": 40,
-      "type": 2
-    },
-    "6": {
-      "lane": [1, 1, 1, 1],
-      "cache_hit": 90,
-      "cache_miss": 40,
-      "type": 2
-    }
-  },
-
-  "task2": {
-    "1": {
-      "lane": [0, 1, 0, 1],
-      "cache_hit": 90,
-      "cache_miss": 40,
-      "type": 1
-    },
-    "2": {
-      "lane": [1, 1, 1, 1],
-      "cache_hit": 90,
-      "cache_miss": 40,
-      "type": 2
-    }
-  }
-}
+[
+{"region_id":3,"region_type":1,"start_line":28,"end_line":31,"task":1,"total_num_lanes":8,"initial_mask":252,"lane_usage":[{"line":28,"percent":0.125},{"line":29,"percent":0.625}],"ipc":0.3365672572612007,"l2_hit":0.15205028434600419,"l3_hit":0.8485704200494176,"bytes_read":2560.0},
+{"region_id":2,"region_type":1,"start_line":26,"end_line":31,"task":1,"total_num_lanes":8,"initial_mask":254,"lane_usage":[{"line":26,"percent":0.125},{"line":27,"percent":0.75}],"ipc":0.3494838195086403,"l2_hit":0.16451805685989927,"l3_hit":0.7974657674228489,"bytes_read":43968.0},
+{"region_id":1,"region_type":1,"start_line":23,"end_line":31,"task":1,"total_num_lanes":8,"initial_mask":255,"lane_usage":[{"line":23,"percent":0.125},{"line":24,"percent":0.875}],"ipc":0.3691585207178529,"l2_hit":0.1848876286494434,"l3_hit":0.8087998453907106,"bytes_read":82752.0},
+{"region_id":4,"region_type":5,"start_line":15,"end_line":16,"task":1,"total_num_lanes":8,"initial_mask":255,"lane_usage":[],"ipc":0.5691838711684248,"l2_hit":0.22822822822822823,"l3_hit":0.9353112840466926,"bytes_read":576.0},
+{"region_id":6,"region_type":2,"start_line":37,"end_line":39,"task":1,"total_num_lanes":8,"initial_mask":1,"lane_usage":[{"line":37,"percent":0.125}],"ipc":0.8201628983743959,"l2_hit":0.6310217046056115,"l3_hit":0.9913916786226685,"bytes_read":7872.0},
+{"region_id":5,"region_type":1,"start_line":36,"end_line":37,"task":1,"total_num_lanes":8,"initial_mask":255,"lane_usage":[{"line":36,"percent":0.125}],"ipc":0.8313826905353702,"l2_hit":0.6251576860695621,"l3_hit":0.9966346153846154,"bytes_read":18496.0},
+{"region_id":7,"region_type":3,"start_line":42,"end_line":43,"task":1,"total_num_lanes":8,"initial_mask":255,"lane_usage":[{"line":43,"percent":0.5}],"ipc":0.8309668158464081,"l2_hit":0.6361631753031973,"l3_hit":0.9954545454545455,"bytes_read":1024.0},
+{"region_id":0,"region_type":5,"start_line":21,"end_line":43,"task":1,"total_num_lanes":8,"initial_mask":255,"lane_usage":[],"ipc":0.5114936343662608,"l2_hit":0.3270406370769411,"l3_hit":0.8608520116942782,"bytes_read":152640.0} 
+]
