@@ -29,11 +29,11 @@ if __name__ == '__main__':
     # TODO use real percentage
     lane_percentage = random.randint(0, 100)
     if (lane_percentage < 30): 
-      line = "<cline onclick='%s'>%s</cline>" % (onclickHandler, line)
+      line = "<cline id='line_%d' onclick='%s'>%s</cline>" % (i, onclickHandler, line)
     elif (lane_percentage < 70): 
-      line = "<dline onclick='%s'>%s</dline>" % (onclickHandler, line)
+      line = "<dline id='line_%d' onclick='%s'>%s</dline>" % (i, onclickHandler, line)
     else: 
-      line = "<eline onclick='%s'>%s</eline>" % (onclickHandler, line)
+      line = "<eline id='line_%d' onclick='%s'>%s</eline>" % (i, onclickHandler, line)
 
     print line
     i += 1

@@ -43,4 +43,6 @@ profile_line {
   border:0;
 }
 
-
+.selected_line {
+  background-color: #00CCFF;
+}
