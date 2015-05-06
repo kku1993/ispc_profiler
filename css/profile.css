@@ -110,3 +110,24 @@ lane:hover {
  color:green;
  left: 200px;
 }
+
+.selected_line {
+  background-color: #00CCFF;
+  }
+
+
+  .selected_line [line_color='yellow'] {
+    background-color: #00CCFF;
+    }
+
+.selected_line [line_color='black'] {
+    background-color: #00CCFF;
+    }
+    .selected_line[line_color='green'] {
+      background-color: green;
+      }
+
+.selected_line[line_color='red'] {
+  background-color: red;
+} 
+

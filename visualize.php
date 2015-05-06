@@ -3,6 +3,11 @@
 <head>
   <title> ISPC Profiler </title>
 
+  <!-- Angular JS libraries -->
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular-route.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.0-rc.1/angular-animate.js"></script>
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script> 
  <!-- highlight.js -->
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/styles/default.min.css">
@@ -172,7 +177,108 @@ echo $formatted_code;
   <script>hljs.initHighlightingOnLoad();</script>
 
   <script type="text/javascript">
+<?php
+  $profile= shell_exec("cat " . $profile_path);
+  $profile = str_replace("\"", "\\\"", $profile);
+  $profile = str_replace("\n", "", $profile);
+  echo "var profile_data = JSON.parse(\"{$profile}\");\n";
+?>
+  profile_data['regions'].sort(function(a,b) { return (a['start_line']) - (b['start_line']) } );
+  for (var i = 0; i < profile_data['regions'].length; i++) {
+    profile_data['regions'][i]['region_id'] = i;
+  }
+  console.log(profile_data['regions']);
+  </script>
+
+  <script type="text/javascript">
+  function search_line(lineNum) {
+    for (var i = 0; i < profile_data['regions'].length; i++) {
+      // Found the region this click belongs to
+      if (profile_data['regions'][i]['start_line'] > lineNum || i == (profile_data['regions'].length-1)) {
+        // If it's prior to the first start_line then only highlight the line
+        if (i == 0) {
+          console.log(lineNum);
+          document.getElementById('line_'+lineNum.toString()).className += "selected_line ";
+          document.getElementById('line_'+lineNum.toString()).setAttribute('line_color', 'yellow');
+          console.log("OWO");
+          break;
+        }
+        // If contained within this region, highlight entire region
+        if (lineNum <= profile_data['regions'][i-1]['end_line']) {
+          for (var j = profile_data['regions'][i-1]['start_line']; j < (profile_data['regions'][i-1]['end_line']+1); j++) {
+            console.log("JELLY")
+              highlight_line(i-1,j);
+            console.log("END OF JELLY");
+          }
+        }
+        // If not, only highlight the line
+        else {
+          console.log("line 292 else case");
+          document.getElementById('line_'+lineNum.toString()).className += "selected_line ";
+          document.getElementById('line_'+lineNum.toString()).setAttribute('line_color', 'yellow');
+        }
+        break;
+      }
+    }
+  }
+
+function highlight_line(region_id, line_number) {  
+  console.log("start",region_id," ",line_number);
+  document.getElementById('line_'+line_number.toString()).className += "selected_line ";
+  console.log("wtf");
+
+  if (profile_data['regions'][region_id].lane_usage.length == 0) {
+    console.log('length too small');
+    return;
+  }
+
+  // If youre fall in the first part of the lane usage
+  if (line_number <= profile_data['regions'][region_id].lane_usage[1].line) {
+    if (profile_data['regions'][region_id].lane_usage[0].percent < 30) { 
+      console.log("hohoho", document.getElementById('line_'+line_number.toString()).getAttribute('line_color'));
+      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'black');
+
+      //document.getElementById('line_'+line_number.toString()).line_color = 'black');
+      console.log('black');
+      console.log("rororo",document.getElementById('line_'+line_number.toString()).getAttribute('line_color'));
+    }
+    else if (profile_data['regions'][region_id].lane_usage[0].percent < 70) {
+      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'green');
+      console.log('green');
+    }
+    else {
+      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'red');
+      console.log('red');
+    }
+  }
+  // If youre fall in the second part of the lane usage
+  else {
+    console.log("ELSE HAAAAAAAAA");
+    if (profile_data['regions'][region_id].lane_usage[1].percent < 30) {       i
+      console.log('black');
+      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'black');
+    }
+    else if (profile_data['regions'][region_id].lane_usage[1].percent < 70) {
+      console.log('green');
+      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'green');
+    }
+    else {
+      console.log('red');
+      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'red');
+    }
+  }
+}
+
+
+
     // Handler for when the user clicks on a line.
+    /*
+    var source_code = document.getElementsByClassName("source_code");
+    for (var i = 0; i < source_code.length; i++) {
+      search_line(i);
+    }
+    */
+
     function clickedLine(lineNum) {
       // TODO use real task, end line number
 <?php
@@ -181,12 +287,21 @@ echo $formatted_code;
       var url = "profile.php?task=1&end=10000&start=" + lineNum.toString() + 
           "&file=" + profile_name;
       document.getElementById('profile_frame').src = url;
-      var previously_selected = document.getElementsByClassName("selected_line");
-      for (var i=0; i<previously_selected.length; i++) {
-        previously_selected[i].className = 
-          previously_selected[i].className.replace( /(?:^|\s)selected_line(?!\S)/g , '' )
+      
+      // Stop selecting all previous line
+      var previously_selected = document.getElementsByClassName("selected_line ");
+      //for (var i=0; i < previously_selected.length; i++) {
+      while (previously_selected.length > 0) {
+        console.log("REMOVING LINE");
+        previously_selected[0].className = 
+          previously_selected[0].className.replace( /(?:^|\s)selected_line(?!\S)/g , '' );
       }
-      document.getElementById('line_'+lineNum.toString()).className += "selected_line";
+
+      search_line(lineNum);
+
+      console.log("ksandlksad",document.getElementById('line_'+lineNum.toString()).getAttribute('line_color'));
+      console.log("FINISHED CLICK");
+      //document.getElementById('line_'+lineNum.toString()).className += "selected_line";
     }
   </script>
 
