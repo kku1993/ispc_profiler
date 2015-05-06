@@ -1,6 +1,5 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-/*
 task void foo_task() {
   foreach (i = 1 ... 1000) {
     int y = 0;
@@ -9,7 +8,6 @@ task void foo_task() {
     }
   }
 }
-*/
 
 void bar(int a) {
   int b = a + 100;
@@ -17,21 +15,32 @@ void bar(int a) {
 }
 
 export void foo(uniform double arr[], uniform int len) {
-  //launch foo_task();
+  launch foo_task();
   int a = programIndex;
   int b = 1;
   int c = 1;
+  int d = 1;
 
   // Testing nested if statements and else if statements.
   if (a == 0) {
     b = 0;
-  } else {
-    if (a == 1)
+  } 
+  else {
+    if (a == 1) {
       b = 1;
-    else if (a == 2)
+      a = 2;
+      d = 2;
+    }
+    else if (a == 2) {
       b = 2;
-    else
+      a = 2;
+      d = 2;
+    }
+    else {
       b = 3;
+      a = 2;
+      d = 2;
+    }
   }
 
   // Test coherent control flow detection.
@@ -49,6 +58,18 @@ export void foo(uniform double arr[], uniform int len) {
     for (int i = 0; i < MIN(5, len); i++) {
       b += (int) arr[i];
     }
+  }
+
+  // Test switch
+  switch (b) {
+    case 0:
+      b = 1;
+      break;
+    case 1:
+      b = 2;
+    default:
+      b = 0;
+      break;
   }
   
   // Test foreach.
