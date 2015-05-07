@@ -98,15 +98,8 @@
         <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
         <li><a href="#">Link</a></li>
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
-          <ul class="dropdown-menu" role="menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
-            <li class="divider"></li>
-            <li><a href="#">Separated link</a></li>
-            <li class="divider"></li>
-            <li><a href="#">One more separated link</a></li>
+          <a href="#" class="dropdown-toggle" id="task_menu_wrapper" data-toggle="dropdown" role="button" aria-expanded="false"> Choose Task  <span class="caret"></span></a>
+          <ul class="dropdown-menu" id="task_menu" role="menu">
           </ul>
         </li>
       </ul>
@@ -116,19 +109,6 @@
         </div>
         <button type="submit" class="btn btn-default">Submit</button>
       </form>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="#">Link</a></li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
-          <ul class="dropdown-menu" role="menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
-            <li class="divider"></li>
-            <li><a href="#">Separated link</a></li>
-          </ul>
-        </li>
-      </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
@@ -148,15 +128,83 @@
         </ul>
         <div class="tab-content">
          <div class="tab-pane active" id="a">
+          
+          <!-- Display checkbox -->
+          <div class="checkbox">
+            <label><input type="checkbox" id="toggle_all" value="" onclick="toggle_all()"   aria-label="..."> Display Overall Lane Usage  </label>
+          </div>
+          
           <!-- Display source code -->
           <pre> 
             <code class="cpp">
 <?php
 echo $formatted_code;
 ?>
-              </code>
+            </code>
           </pre>
+
+         <!-- Table displaying stats -->
+         <table class="table" id="stat_box" style="display:none; width:20%; position:fixed; top:200px; right:20px">
+          <tr></tr>
+            <td><strong> Task Number </strong></td>
+            <td id="task_value"></td>
+          </tr>
+
+          <tr></tr>
+            <td><strong> Line Number </strong></td>
+            <td id="line_value"></td>
+          </tr>
+ 
+          <tr></tr>
+            <td><strong> Line Text </strong></td>
+            <td id="text_value"></td>
+          </tr>
+
+          <tr></tr>
+            <td><strong> Instructions per Cycle </strong></td>
+            <td id="ipc_value"></td>
+          </tr>
+  
+          <tr>
+            <td><strong> L2 Cache Hit Percentage </strong></td>
+            <td id="l2_value"></td> 
+          </tr>
+
+          <tr>
+            <td><strong> L3 Cache Hit Percentage </strong></td>
+            <td id="l3_value"></td> 
+          </tr>
+
+          </table>
+
          </div>
+
+
+          <!---
+          <div id="stat_box" style="position:fixed">
+         <address>
+           <div id="ipc_heading">
+            <strong>Instructions per Cycle</strong> 
+           </div>
+           <div id="ipc">
+           0
+           </div>
+           <div id="l2_heading">
+            <strong>L2 Cache Hit Percentage</strong>
+           </div>
+           <div id="l2">
+           0
+           </div>
+           <div id="l3_heading">
+            <strong>L3 Cache Hit Percentage</strong>
+           </div>
+           <div id="l3">
+             795 Folsom Ave, Suite 600<br>
+             San Francisco, CA 94107<br>
+           </div>
+          </div>
+          -->
+
          <div class="tab-pane" id="b">
           <!-- iframe to display stats -->
           <iframe id='profile_frame' src='profile.php' width='50%' height='100%' style='border:none; float:right;' ></iframe>
@@ -183,102 +231,21 @@ echo $formatted_code;
   $profile = str_replace("\n", "", $profile);
   echo "var profile_data = JSON.parse(\"{$profile}\");\n";
 ?>
-  profile_data['regions'].sort(function(a,b) { return (a['start_line']) - (b['start_line']) } );
-  for (var i = 0; i < profile_data['regions'].length; i++) {
-    profile_data['regions'][i]['region_id'] = i;
+
+  // Processing input file TODO: sort by task id, change default task id
+  var task_id = 0;
+  profile_data.sort(function(a,b) {return (a['task_']) - (b['task']) } );
+  for (i = 0; i < profile_data.length; i++) {
+    profile_data[i]['regions'].sort(function(a,b) { return (a['start_line']) - (b['start_line']) } );
+  for (var j = 0; j < profile_data[i]['regions'].length; j++) {
+    profile_data[i]['regions'][j]['region_id'] = j;
   }
-  console.log(profile_data['regions']);
+  }
+  console.log(profile_data[task_id]['regions']);
   </script>
 
   <script type="text/javascript">
-  function search_line(lineNum) {
-    for (var i = 0; i < profile_data['regions'].length; i++) {
-      // Found the region this click belongs to
-      if (profile_data['regions'][i]['start_line'] > lineNum || i == (profile_data['regions'].length-1)) {
-        // If it's prior to the first start_line then only highlight the line
-        if (i == 0) {
-          console.log(lineNum);
-          document.getElementById('line_'+lineNum.toString()).className += "selected_line ";
-          document.getElementById('line_'+lineNum.toString()).setAttribute('line_color', 'yellow');
-          console.log("OWO");
-          break;
-        }
-        // If contained within this region, highlight entire region
-        if (lineNum <= profile_data['regions'][i-1]['end_line']) {
-          for (var j = profile_data['regions'][i-1]['start_line']; j < (profile_data['regions'][i-1]['end_line']+1); j++) {
-            console.log("JELLY")
-              highlight_line(i-1,j);
-            console.log("END OF JELLY");
-          }
-        }
-        // If not, only highlight the line
-        else {
-          console.log("line 292 else case");
-          document.getElementById('line_'+lineNum.toString()).className += "selected_line ";
-          document.getElementById('line_'+lineNum.toString()).setAttribute('line_color', 'yellow');
-        }
-        break;
-      }
-    }
-  }
-
-function highlight_line(region_id, line_number) {  
-  console.log("start",region_id," ",line_number);
-  document.getElementById('line_'+line_number.toString()).className += "selected_line ";
-  console.log("wtf");
-
-  if (profile_data['regions'][region_id].lane_usage.length == 0) {
-    console.log('length too small');
-    return;
-  }
-
-  // If youre fall in the first part of the lane usage
-  if (line_number <= profile_data['regions'][region_id].lane_usage[1].line) {
-    if (profile_data['regions'][region_id].lane_usage[0].percent < 30) { 
-      console.log("hohoho", document.getElementById('line_'+line_number.toString()).getAttribute('line_color'));
-      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'black');
-
-      //document.getElementById('line_'+line_number.toString()).line_color = 'black');
-      console.log('black');
-      console.log("rororo",document.getElementById('line_'+line_number.toString()).getAttribute('line_color'));
-    }
-    else if (profile_data['regions'][region_id].lane_usage[0].percent < 70) {
-      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'green');
-      console.log('green');
-    }
-    else {
-      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'red');
-      console.log('red');
-    }
-  }
-  // If youre fall in the second part of the lane usage
-  else {
-    console.log("ELSE HAAAAAAAAA");
-    if (profile_data['regions'][region_id].lane_usage[1].percent < 30) {       i
-      console.log('black');
-      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'black');
-    }
-    else if (profile_data['regions'][region_id].lane_usage[1].percent < 70) {
-      console.log('green');
-      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'green');
-    }
-    else {
-      console.log('red');
-      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'red');
-    }
-  }
-}
-
-
-
     // Handler for when the user clicks on a line.
-    /*
-    var source_code = document.getElementsByClassName("source_code");
-    for (var i = 0; i < source_code.length; i++) {
-      search_line(i);
-    }
-    */
-
     function clickedLine(lineNum) {
       // TODO use real task, end line number
 <?php
@@ -288,21 +255,22 @@ function highlight_line(region_id, line_number) {
           "&file=" + profile_name;
       document.getElementById('profile_frame').src = url;
       
-      // Stop selecting all previous line
-      var previously_selected = document.getElementsByClassName("selected_line ");
-      //for (var i=0; i < previously_selected.length; i++) {
-      while (previously_selected.length > 0) {
-        console.log("REMOVING LINE");
-        previously_selected[0].className = 
-          previously_selected[0].className.replace( /(?:^|\s)selected_line(?!\S)/g , '' );
-      }
+      deselect_all_lines();
 
       search_line(lineNum);
 
-      console.log("ksandlksad",document.getElementById('line_'+lineNum.toString()).getAttribute('line_color'));
-      console.log("FINISHED CLICK");
-      //document.getElementById('line_'+lineNum.toString()).className += "selected_line";
+      update_stats(lineNum);
+     
+      document.getElementById('toggle_all').checked=false;
     }
+  </script>
+
+  <script type="text/javascript" src="js/visualize.js"> </script>
+  <script type="text/javascript">
+    //toggle_all();
+    document.getElementById('task_menu').innerHTML = create_task_menu();
+    document.getElementById('toggle_all').checked=true;
+    toggle_all();
   </script>
 
 </body>

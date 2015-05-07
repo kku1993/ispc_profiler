@@ -111,23 +111,29 @@ lane:hover {
  left: 200px;
 }
 
+/*
 .selected_line {
+  background-color: blue;
+}
+*/
+
+
+.selected_line[line_color='yellow'] {
+  background-color: yellow;
+}
+
+.selected_line[line_color='black'] {
   background-color: #00CCFF;
   }
 
-
-  .selected_line [line_color='yellow'] {
-    background-color: #00CCFF;
-    }
-
-.selected_line [line_color='black'] {
-    background-color: #00CCFF;
-    }
-    .selected_line[line_color='green'] {
-      background-color: green;
-      }
+.selected_line[line_color='green'] {
+  background-color: green;
+  }
 
 .selected_line[line_color='red'] {
   background-color: red;
 } 
 
+.selected_tab {
+  background-color: blue;
+}

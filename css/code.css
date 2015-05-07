@@ -44,7 +44,7 @@ profile_line {
 }
 
 
-
+/*
 .selected_line {
   background-color: #00CCFF;
 }
@@ -53,7 +53,9 @@ profile_line {
   background-color: #00CCFF;
 }
 
-
+.selected_line [line_color='yellow'] {
+  background-color: yellow;
+}
 
 .selected_line[line_color='green'] {
   background-color: green;
@@ -62,4 +64,4 @@ profile_line {
 .selected_line [line_color='red'] {
   background-color: red;
 }
-
+*/
