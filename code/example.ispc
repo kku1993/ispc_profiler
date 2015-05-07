@@ -1,11 +1,18 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-task void foo_task() {
+task void task1() {
   foreach (i = 1 ... 1000) {
     int y = 0;
     for (int x = 0; x < i * 2; x++) {
       y++;
     }
+  }
+}
+
+task void task2() {
+  uniform int y = 0;
+  for (int x = 0; x < 5; x++) {
+    y++;
   }
 }
 
@@ -15,7 +22,8 @@ void bar(int a) {
 }
 
 export void foo(uniform double arr[], uniform int len) {
-  launch foo_task();
+  launch task1();
+  launch task2();
   int a = programIndex;
   int b = 1;
   int c = 1;
@@ -53,10 +61,12 @@ export void foo(uniform double arr[], uniform int len) {
   // Testing function call.
   bar(b);
 
-  // Test for loop nested in if.
+  // Test unmask.
   if (a == 0) {
-    for (int i = 0; i < MIN(5, len); i++) {
-      b += (int) arr[i];
+    unmasked {
+      for (int i = 0; i < MIN(8, len); i++) {
+        b += (int) arr[i];
+      }
     }
   }
 
