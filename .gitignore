@@ -1,3 +1,4 @@
 *.swp
 profile/
 code/
+*.pyc
