@@ -30,78 +30,16 @@
 
 <body>
 <?php
-  // Get the uploaded file by name
-  function upload($name, $target_dir) {
-    // Check upload file exists
-    $f = $_FILES[$name];
-
-    $files = array();
-    $fdata = $_FILES[$name];
-    if (is_array($fdata['name'])) {
-      for($i = 0; $i < count($fdata['name']); ++$i){
-        if (!file_exists($fdata["tmp_name"][$i]) || 
-            !is_uploaded_file($fdata["tmp_name"][$i])) {
-          echo "No files uploaded. <br/>";
-          return NULL;
-        }
-
-        $files[]=array(
-          'name'    =>$fdata['name'][$i],
-          'type'  => $fdata['type'][$i],
-          'tmp_name'=>$fdata['tmp_name'][$i],
-          'error' => $fdata['error'][$i], 
-          'size'  => $fdata['size'][$i]  
-          );
-      }
-    } else 
-      $files[] = $fdata;
-
-    // Make output dir
-    if (!mkdir($target_dir, 0777)) {
-      echo "Failed to mkdir<br/>";
-    }
-
-    $tmp_names = array();
-    foreach ($files as $f) {
-      if ($name == "code") {
-        $file_name = basename($f["name"]);
-        $target_file = $target_dir."/".$file_name;
-
-        if (!move_uploaded_file($f["tmp_name"], $target_file)) {
-          echo "Sorry, there was an error uploading your file. <br/>";
-          return NULL;
-        }
-      } else {
-        // Concatenate all profile into 1 file.
-        $tmp_names[] = $f["tmp_name"];
-      }
-    }
-
-    if ($name == "profile") {
-      // Concatenate all profile into 1 file.
-      $target_file = $target_dir."/profile_file"; 
-      $args = implode(" ", $tmp_names);
-      shell_exec("./concat_profile.py " . $args . " " . $target_file);
-    }
-
-    return $target_file;
-  }
-
-  // Tmp directory name to store the uploaded files
-  $date = date_create();
-  $dir_name = date_timestamp_get($date);
-
-  // Get the uploaded source file and profiler data
-  $code_path = upload("code", "code/".$dir_name);
-  if ($code_path == NULL) {
-    // Use the default example path
+  if(!isset($_GET["upload_id"]) || !isset($_GET["code"])) {
+    echo "Using example code and profile.<br/><br/>";
     $code_path = "code/example.ispc";
     $profile_path = "profile/example.profile";
   } else {
-    $profile_path = upload("profile", "profile/".$dir_name);
-    if ($profile_path == NULL) {
-      exit(1);
-    }
+    $upload_id = $_GET["upload_id"];
+    $code_name = $_GET["code"];
+    $code_dir = "code/" . $upload_id;
+    $code_path = "code/" . $upload_id ."/" . $code_name;
+    $profile_path = "profile/" . $upload_id . "/profile_file";
   }
 
   // File name of the uploaded code and profile files
@@ -122,26 +60,47 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">ISPC Performance Monitoring for Dummies</a>
+      <a class="navbar-brand" href="index.html">ISPC Performance Monitoring for Dummies</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
-        <li><a href="#">Link</a></li>
+        <li>
+          <!-- Space to display the current task -->
+          <a href="#" id="task_menu_wrapper" role="button" aria-expanded="false">Task 0</a>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" id="source_dropdown" data-toggle="dropdown" role="button" aria-expanded="false"> Source File <span class="caret"></span></a>
+          <ul class="dropdown-menu" id="source_menu" role="menu">
+<?php
+  // Output source file selections
+  $files = scandir($code_dir);
+  foreach ($files as $f) {
+    if ($f == "." || $f == "..")
+      continue;
+    
+    $file_name = basename($f);
+    echo "<li><a href='visualize.php?upload_id={$upload_id}&code={$file_name}'>{$file_name}</a></li>";
+    echo "<li class='divider'></li>";
+  }
+?>
+          </ul>
+        </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" id="task_menu_wrapper" data-toggle="dropdown" role="button" aria-expanded="false"> Choose Task  <span class="caret"></span></a>
           <ul class="dropdown-menu" id="task_menu" role="menu">
           </ul>
         </li>
       </ul>
+<!--
       <form class="navbar-form navbar-left" role="search">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search">
         </div>
         <button type="submit" class="btn btn-default">Submit</button>
       </form>
+-->
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
@@ -168,6 +127,11 @@
           </div>
           
           <!-- Display source code -->
+<h3>
+<?php
+echo $code_name;
+?>
+</h3>
           <pre> 
             <code class="cpp">
 <?php
@@ -235,6 +199,7 @@ echo $formatted_code;
   $profile = str_replace("\"", "\\\"", $profile);
   $profile = str_replace("\n", "", $profile);
   echo "var profile_data = JSON.parse(\"{$profile}\");\n";
+  echo "var source_file = \"{$code_name}\";\n";
 ?>
 
   // Processing input file TODO: sort by task id, change default task id
@@ -242,9 +207,9 @@ echo $formatted_code;
   profile_data.sort(function(a,b) {return (a['task_']) - (b['task']) } );
   for (i = 0; i < profile_data.length; i++) {
     profile_data[i]['regions'].sort(function(a,b) { return (a['start_line']) - (b['start_line']) } );
-  for (var j = 0; j < profile_data[i]['regions'].length; j++) {
-    profile_data[i]['regions'][j]['region_id'] = j;
-  }
+    for (var j = 0; j < profile_data[i]['regions'].length; j++) {
+      profile_data[i]['regions'][j]['region_id'] = j;
+    }
   }
   console.log(profile_data[task_id]['regions']);
   </script>
