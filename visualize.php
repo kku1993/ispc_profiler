@@ -34,38 +34,71 @@
   function upload($name, $target_dir) {
     // Check upload file exists
     $f = $_FILES[$name];
-    if (!file_exists($f["tmp_name"]) || 
-        !is_uploaded_file($f["tmp_name"])) {
-      echo "No files uploaded. <br/>";
-      return NULL;
+
+    $files = array();
+    $fdata = $_FILES[$name];
+    if (is_array($fdata['name'])) {
+      for($i = 0; $i < count($fdata['name']); ++$i){
+        if (!file_exists($fdata["tmp_name"][$i]) || 
+            !is_uploaded_file($fdata["tmp_name"][$i])) {
+          echo "No files uploaded. <br/>";
+          return NULL;
+        }
+
+        $files[]=array(
+          'name'    =>$fdata['name'][$i],
+          'type'  => $fdata['type'][$i],
+          'tmp_name'=>$fdata['tmp_name'][$i],
+          'error' => $fdata['error'][$i], 
+          'size'  => $fdata['size'][$i]  
+          );
+      }
+    } else 
+      $files[] = $fdata;
+
+    // Make output dir
+    if (!mkdir($target_dir, 0777)) {
+      echo "Failed to mkdir<br/>";
     }
 
-    // Assign a random file name to prevent the user from crafting a filename
-    // that would allow arbitray code execution when we
-    // use the python script to generate the formatted output later on.
-    // TODO ensure no 2 user's code could clash
-    $date = date_create();
-    // $base_name = basename($f["name"]);
-    $file_name = date_timestamp_get($date);
-    $target_file = $target_dir."/".$file_name;
-    $imageFileType = pathinfo($target_file, PATHINFO_EXTENSION);
+    $tmp_names = array();
+    foreach ($files as $f) {
+      if ($name == "code") {
+        $file_name = basename($f["name"]);
+        $target_file = $target_dir."/".$file_name;
 
-    if (!move_uploaded_file($f["tmp_name"], $target_file)) {
-      echo "Sorry, there was an error uploading your file. <br/>";
-      return NULL;
+        if (!move_uploaded_file($f["tmp_name"], $target_file)) {
+          echo "Sorry, there was an error uploading your file. <br/>";
+          return NULL;
+        }
+      } else {
+        // Concatenate all profile into 1 file.
+        $tmp_names[] = $f["tmp_name"];
+      }
+    }
+
+    if ($name == "profile") {
+      // Concatenate all profile into 1 file.
+      $target_file = $target_dir."/profile_file"; 
+      $args = implode(" ", $tmp_names);
+      shell_exec("./concat_profile.py " . $args . " " . $target_file);
     }
 
     return $target_file;
   }
 
+  // Tmp directory name to store the uploaded files
+  $date = date_create();
+  $dir_name = date_timestamp_get($date);
+
   // Get the uploaded source file and profiler data
-  $code_path = upload("code", "code");
+  $code_path = upload("code", "code/".$dir_name);
   if ($code_path == NULL) {
     // Use the default example path
     $code_path = "code/example.ispc";
     $profile_path = "profile/example.profile";
   } else {
-    $profile_path = upload("profile", "profile");
+    $profile_path = upload("profile", "profile/".$dir_name);
     if ($profile_path == NULL) {
       exit(1);
     }
@@ -179,39 +212,11 @@ echo $formatted_code;
 
          </div>
 
-
-          <!---
-          <div id="stat_box" style="position:fixed">
-         <address>
-           <div id="ipc_heading">
-            <strong>Instructions per Cycle</strong> 
-           </div>
-           <div id="ipc">
-           0
-           </div>
-           <div id="l2_heading">
-            <strong>L2 Cache Hit Percentage</strong>
-           </div>
-           <div id="l2">
-           0
-           </div>
-           <div id="l3_heading">
-            <strong>L3 Cache Hit Percentage</strong>
-           </div>
-           <div id="l3">
-             795 Folsom Ave, Suite 600<br>
-             San Francisco, CA 94107<br>
-           </div>
-          </div>
-          -->
-
          <div class="tab-pane" id="b">
           <!-- iframe to display stats -->
-          <iframe id='profile_frame' src='profile.php' width='50%' height='100%' style='border:none; float:right;' ></iframe>
-
         </div>
-        <div class="tab-pane" id="c">Thirdamuno, ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. 
-         Quisque mauris augue, molestie tincidunt condimentum vitae. </div>
+        <div class="tab-pane" id="c">
+        </div>
         </div>
       </div>
       <!-- /tabs -->
