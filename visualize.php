@@ -159,7 +159,17 @@ echo $formatted_code;
             <td><strong> Line Text </strong></td>
             <td id="text_value"></td>
           </tr>
+          
+          <tr></tr>
+            <td><strong> Lane 1 Usage </strong></td>
+            <td id="lane_1"></td>
+          </tr>
 
+          <tr></tr>
+            <td><strong> Lane 2 Usage </strong></td>
+            <td id="lane_2"></td>
+          </tr>
+          
           <tr></tr>
             <td><strong> Instructions per Cycle </strong></td>
             <td id="ipc_value"></td>
@@ -234,7 +244,7 @@ echo $formatted_code;
 
   // Processing input file TODO: sort by task id, change default task id
   var task_id = 0;
-  profile_data.sort(function(a,b) {return (a['task_']) - (b['task']) } );
+  profile_data.sort(function(a,b) {return (a['task']) - (b['task']) } );
   for (i = 0; i < profile_data.length; i++) {
     profile_data[i]['regions'].sort(function(a,b) { return (a['start_line']) - (b['start_line']) } );
   for (var j = 0; j < profile_data[i]['regions'].length; j++) {
