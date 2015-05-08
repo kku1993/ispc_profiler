@@ -30,45 +30,16 @@
 
 <body>
 <?php
-  // Get the uploaded file by name
-  function upload($name, $target_dir) {
-    // Check upload file exists
-    $f = $_FILES[$name];
-    if (!file_exists($f["tmp_name"]) || 
-        !is_uploaded_file($f["tmp_name"])) {
-      echo "No files uploaded. <br/>";
-      return NULL;
-    }
-
-    // Assign a random file name to prevent the user from crafting a filename
-    // that would allow arbitray code execution when we
-    // use the python script to generate the formatted output later on.
-    // TODO ensure no 2 user's code could clash
-    $date = date_create();
-    // $base_name = basename($f["name"]);
-    $file_name = date_timestamp_get($date);
-    $target_file = $target_dir."/".$file_name;
-    $imageFileType = pathinfo($target_file, PATHINFO_EXTENSION);
-
-    if (!move_uploaded_file($f["tmp_name"], $target_file)) {
-      echo "Sorry, there was an error uploading your file. <br/>";
-      return NULL;
-    }
-
-    return $target_file;
-  }
-
-  // Get the uploaded source file and profiler data
-  $code_path = upload("code", "code");
-  if ($code_path == NULL) {
-    // Use the default example path
+  if(!isset($_GET["upload_id"]) || !isset($_GET["code"])) {
+    echo "Using example code and profile.<br/><br/>";
     $code_path = "code/example.ispc";
     $profile_path = "profile/example.profile";
   } else {
-    $profile_path = upload("profile", "profile");
-    if ($profile_path == NULL) {
-      exit(1);
-    }
+    $upload_id = $_GET["upload_id"];
+    $code_name = $_GET["code"];
+    $code_dir = "code/" . $upload_id;
+    $code_path = "code/" . $upload_id ."/" . $code_name;
+    $profile_path = "profile/" . $upload_id . "/profile_file";
   }
 
   // File name of the uploaded code and profile files
@@ -89,26 +60,47 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">ISPC Performance Monitoring for Dummies</a>
+      <a class="navbar-brand" href="index.html">ISPC Performance Monitoring for Dummies</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
-        <li><a href="#">Link</a></li>
+        <li>
+          <!-- Space to display the current task -->
+          <a href="#" id="task_menu_wrapper" role="button" aria-expanded="false">Task 0</a>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" id="source_dropdown" data-toggle="dropdown" role="button" aria-expanded="false"> Source File <span class="caret"></span></a>
+          <ul class="dropdown-menu" id="source_menu" role="menu">
+<?php
+  // Output source file selections
+  $files = scandir($code_dir);
+  foreach ($files as $f) {
+    if ($f == "." || $f == "..")
+      continue;
+    
+    $file_name = basename($f);
+    echo "<li><a href='visualize.php?upload_id={$upload_id}&code={$file_name}'>{$file_name}</a></li>";
+    echo "<li class='divider'></li>";
+  }
+?>
+          </ul>
+        </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" id="task_menu_wrapper" data-toggle="dropdown" role="button" aria-expanded="false"> Choose Task  <span class="caret"></span></a>
           <ul class="dropdown-menu" id="task_menu" role="menu">
           </ul>
         </li>
       </ul>
+<!--
       <form class="navbar-form navbar-left" role="search">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search">
         </div>
         <button type="submit" class="btn btn-default">Submit</button>
       </form>
+-->
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
@@ -135,6 +127,11 @@
           </div>
           
           <!-- Display source code -->
+<h3>
+<?php
+echo $code_name;
+?>
+</h3>
           <pre> 
             <code class="cpp">
 <?php
@@ -189,39 +186,11 @@ echo $formatted_code;
 
          </div>
 
-
-          <!---
-          <div id="stat_box" style="position:fixed">
-         <address>
-           <div id="ipc_heading">
-            <strong>Instructions per Cycle</strong> 
-           </div>
-           <div id="ipc">
-           0
-           </div>
-           <div id="l2_heading">
-            <strong>L2 Cache Hit Percentage</strong>
-           </div>
-           <div id="l2">
-           0
-           </div>
-           <div id="l3_heading">
-            <strong>L3 Cache Hit Percentage</strong>
-           </div>
-           <div id="l3">
-             795 Folsom Ave, Suite 600<br>
-             San Francisco, CA 94107<br>
-           </div>
-          </div>
-          -->
-
          <div class="tab-pane" id="b">
           <!-- iframe to display stats -->
-          <iframe id='profile_frame' src='profile.php' width='50%' height='100%' style='border:none; float:right;' ></iframe>
-
         </div>
-        <div class="tab-pane" id="c">Thirdamuno, ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. 
-         Quisque mauris augue, molestie tincidunt condimentum vitae. </div>
+        <div class="tab-pane" id="c">
+        </div>
         </div>
       </div>
       <!-- /tabs -->
@@ -240,6 +209,7 @@ echo $formatted_code;
   $profile = str_replace("\"", "\\\"", $profile);
   $profile = str_replace("\n", "", $profile);
   echo "var profile_data = JSON.parse(\"{$profile}\");\n";
+  echo "var source_file = \"{$code_name}\";\n";
 ?>
 
   // Processing input file TODO: sort by task id, change default task id
@@ -247,9 +217,9 @@ echo $formatted_code;
   profile_data.sort(function(a,b) {return (a['task']) - (b['task']) } );
   for (i = 0; i < profile_data.length; i++) {
     profile_data[i]['regions'].sort(function(a,b) { return (a['start_line']) - (b['start_line']) } );
-  for (var j = 0; j < profile_data[i]['regions'].length; j++) {
-    profile_data[i]['regions'][j]['region_id'] = j;
-  }
+    for (var j = 0; j < profile_data[i]['regions'].length; j++) {
+      profile_data[i]['regions'][j]['region_id'] = j;
+    }
   }
   console.log(profile_data[task_id]['regions']);
   </script>
