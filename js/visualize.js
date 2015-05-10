@@ -194,14 +194,15 @@ function update_stats(lineNum) {
       for (var region_id = i-1; region_id >= 0; region_id--) {
         if (lineNum <= profile_data[task_id]['regions'][region_id]['end_line']) {
           var my_region = profile_data[task_id]['regions'][region_id];
-          document.getElementById('ipc_value').innerHTML = my_region['ipc'];
-          if ((profile_data[task_id]['flags'] && 0x40) != 0) {
+          if ((profile_data[task_id]['flags'] & 0x40) != 0) {
             document.getElementById('l2_value').innerHTML = my_region['l2_hit']; 
             document.getElementById('l3_value').innerHTML = my_region['l3_hit'];
+            document.getElementById('ipc_value').innerHTML = my_region['ipc'];
           }
           else {
             document.getElementById('l2_value').innerHTML = "PCM disabled"; 
             document.getElementById('l3_value').innerHTML = "PCM disabled";
+            document.getElementById('ipc_value').innerHTML = "PCM disabled";
           }
           document.getElementById('line_value').innerHTML = lineNum;
           document.getElementById('text_value').innerHTML = document.getElementById('line_'+lineNum.toString()).innerHTML.replace(lineNum.toString(),"").replace('&nbsp;',"");
@@ -272,15 +273,18 @@ function update_stats(lineNum) {
       var last_region = profile_data[task_id]['regions'].slice(-1)[0];
       if (last_region['end_line'] >= lineNum) {
           var my_region = last_region;
-          document.getElementById('ipc_value').innerHTML = my_region['ipc'];
 
-          if ((profile_data[task_id]['flags'] && 0x40) != 0) {
+          if ((profile_data[task_id]['flags'] & 0x40) != 0) {
+            console.log("FLAG SET");
             document.getElementById('l2_value').innerHTML = my_region['l2_hit']; 
             document.getElementById('l3_value').innerHTML = my_region['l3_hit'];
+            document.getElementById('ipc_value').innerHTML = my_region['ipc'];
           }
           else {
+            console.log("FLAG NOT SET");
             document.getElementById('l2_value').innerHTML = "PCM disabled"; 
             document.getElementById('l3_value').innerHTML = "PCM disabled";
+            document.getElementById('ipc_value').innerHTML = "PCM disabled";
           }
 
           document.getElementById('line_value').innerHTML = lineNum;

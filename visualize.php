@@ -160,12 +160,6 @@ echo $formatted_code;
             <td><strong> Lane Usage of Line </strong></td>
             <td><strong> Color Displayed </strong></td>
           </tr>
-  
-          <tr>
-            <td> Function Call </td>
-            <td id="color_function"></td> 
-          </tr>
-          <tr>
  
           <td> x < 30% </td>
             <td id="color_bad"></td> 
@@ -177,13 +171,8 @@ echo $formatted_code;
           </tr>
 
           <tr>
-            <td> 70% <= x < 100% </td>
+            <td> 70% <= x <= 100% </td>
             <td id="color_optimal"></td> 
-          </tr>
-
-          <tr>
-            <td> x = 100% </td>
-            <td id="color_perfect"></td> 
           </tr>
 
           </table>
