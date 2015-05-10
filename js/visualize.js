@@ -37,16 +37,19 @@ function search_line(lineNum) {
       return;
     }
     var last_region = profile_data[task_id]['regions'].slice(-1)[0];
+    console.log("40, test", last_region['end_line'],lineNum);
     if (last_region['end_line'] >= lineNum) {
+      console.log("41 did not get here");
       for (var j = last_region['start_line']; j < (last_region['end_line']+1); j++) {
           highlight_line(profile_data[task_id]['regions'].length-1,j);
-      }     
+      }
+      return;
     }
     // If it's not in the last region, just choose as selected anyway
     var chosenLine =  document.getElementById('line_'+lineNum.toString());
     chosenLine.className += "selected_line ";
     chosenLine.setAttribute('line_color', 'undefined');
-    console.log("not in last region");
+    console.log("not in last region lineNum ->", lineNum);
 }
 
 function highlight_line(region_id, line_number) {  
@@ -79,17 +82,18 @@ function highlight_line(region_id, line_number) {
     if (profile_data[task_id]['regions'][region_id].lane_usage[0].percent < 30) { 
       //console.log("hohoho", document.getElementById('line_'+line_number.toString()).getAttribute('line_color'));
       document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'bad');
+      console.log("82, bad")
       //document.getElementById('line_'+line_number.toString()).line_color = 'bad');
       console.log('highlighting bad');
       //console.log("rororo",document.getElementById('line_'+line_number.toString()).getAttribute('line_color'));
     }
     else if (profile_data[task_id]['regions'][region_id].lane_usage[0].percent < 70) {
       document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'okay');
-      console.log('okay');
+      console.log('89 okay');
     }
     else {
       document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'optimal');
-      console.log('optimal');
+      console.log('93, optimal');
     }
   return;
   }
@@ -98,33 +102,36 @@ function highlight_line(region_id, line_number) {
 
   // TODO: if line is not included, do nothing?
   if (line_number < my_region.lane_usage[0].line) {  
-    console.log("ASIAN");
+    console.log("102, line is not in this region");
     //document.getElementById('line_'+line_number.toString()).className.replace( /(?:^|\s)selected_line(?!\S)/g , '' );
     document.getElementById('line_'+line_number.toString()).className -= "selected_line";
     return;
   }
 
- for (var r = 0; r < my_region.lane_usage.length-1; r++) { 
-  if (line_number < my_region.lane_usage[r+1].line) {
-    if (profile_data[task_id]['regions'][region_id].lane_usage[r].percent < 30) { 
-      //console.log("hohoho", document.getElementById('line_'+line_number.toString()).getAttribute('line_color'));
-      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'bad');
-
-      //document.getElementById('line_'+line_number.toString()).line_color = 'bad');
-      //console.log('bad');
-      //console.log("rororo",document.getElementById('line_'+line_number.toString()).getAttribute('line_color'));
-    }
-    else if (profile_data[task_id]['regions'][region_id].lane_usage[r].percent < 70) {
-      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'okay');
-      console.log('okay');
-    }
-    else {
-      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'optimal');
-      console.log('optimal');
+ for (var r = my_region.lane_usage.length-1; r >= 0; r--) { 
+   if (line_number >= my_region.lane_usage[r].line) {
+      if (profile_data[task_id]['regions'][region_id].lane_usage[r].percent < 30) { 
+        //console.log("hohoho", document.getElementById('line_'+line_number.toString()).getAttribute('line_color'));
+        document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'bad');
+        return;
+        //document.getElementById('line_'+line_number.toString()).line_color = 'bad');
+        console.log('115 bad');
+        //console.log("rororo",document.getElementById('line_'+line_number.toString()).getAttribute('line_color'));
+      }
+      else if (profile_data[task_id]['regions'][region_id].lane_usage[r].percent < 70) {
+        document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'okay');
+        console.log('120 okay');
+        return;
+      }
+      else {
+        document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'optimal');
+        console.log('124 optimal');
+        return;
+      }
     }
   }
-  }
-
+  console.log("HOW");
+}
   
 
   /*
@@ -145,7 +152,7 @@ function highlight_line(region_id, line_number) {
     }
   }
   */
-}
+
 
    function deselect_all_lines() {
       var previously_selected = document.getElementsByClassName("selected_line ");
