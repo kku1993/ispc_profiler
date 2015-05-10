@@ -183,7 +183,7 @@ echo $formatted_code;
           
 
          <!-- Table displaying stats -->
-         <table class="table" id="stat_box" style="display:none; overflow-y:scroll; height:450px">
+         <table class="table" id="stat_box" style="display:none; overflow-y:scroll; height:400px">
           <caption> Statistics Table </caption>
           <tr></tr>
             <td><strong> Task Number </strong></td>
@@ -316,7 +316,7 @@ echo $formatted_code;
       var my_regs = profile_data[task_id]['regions'];
       var reg_num = get_region(lineNum);
       var reg = my_regs[reg_num];
-      if (reg.region_type == 32) {
+      if (reg_num != -1 && reg.region_type == 32) {
 
         for (var j= reg.start_line; j < reg.end_line; j++) {
           highlight_line(reg_num, j);
