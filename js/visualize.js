@@ -208,6 +208,7 @@ function update_stats(lineNum) {
           document.getElementById('line_value').innerHTML = lineNum;
           document.getElementById('text_value').innerHTML = document.getElementById('line_'+lineNum.toString()).innerHTML.replace(lineNum.toString(),"").replace('&nbsp;',"");
           document.getElementById('task_value').innerHTML = task_id;
+          document.getElementById('simd_value').innerHTML = profile_data[task_id]['total_num_lanes'];
           
           // Determine the lane usage
 

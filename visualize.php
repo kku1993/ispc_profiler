@@ -131,11 +131,6 @@
 
          <div class="tab-pane active" style="width:85%" id="a">
           
-          <!-- Display checkbox 
-          <div class="checkbox">
-            <label><input type="checkbox" id="toggle_all" value="" onclick="toggle_all()"   aria-label="..."> Display Overall Lane Usage  </label>
-          </div>
-          -->
 
           <!-- Display source code -->
 <h3>
@@ -215,6 +210,10 @@ echo $formatted_code;
             <td id="l3_value"></td> 
           </tr>
 
+          <tr></tr>
+            <td><strong> SIMD Width </strong></td>
+            <td id="simd_value"></td>
+          </tr>
           </table>
 
          </div> 
