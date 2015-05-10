@@ -26,14 +26,7 @@ if __name__ == '__main__':
 
     onclickHandler = "clickedLine(" + str(i) + ");"
 
-    # TODO use real percentage
-    lane_percentage = random.randint(0, 100)
-    if (lane_percentage < 30): 
-      line = "<dline flag='source_code' id='line_%d' onclick='%s'>%s</dline>" % (i, onclickHandler, line)
-    elif (lane_percentage < 70): 
-      line = "<dline flag='source_code' id='line_%d' onclick='%s'>%s</dline>" % (i, onclickHandler, line)
-    else: 
-      line = "<eline flag='source_code' id='line_%d' onclick='%s'>%s</eline>" % (i, onclickHandler, line)
+    line = "<newline flag='source_code' id='line_%d' onclick='%s'>%d &nbsp %s</newline>" % (i, onclickHandler, i, line)
 
     print line
     i += 1

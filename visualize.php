@@ -115,11 +115,21 @@
       <div class="tabbable tabs-left">
         <ul class="nav nav-tabs">
           <li class="active"><a href="#a" data-toggle="tab">Source Code</a></li>
-          <li><a href="#b" data-toggle="tab">Gang Statistics</a></li>
-          <li><a href="#c" data-toggle="tab">Cache Performance</a></li>
+          <li><a href="#b" data-toggle="tab">Suggestions</a></li>
+          <li><a href="#c" data-toggle="tab">Credits</a></li>
         </ul>
         <div class="tab-content">
-         <div class="tab-pane active" id="a">
+         
+         <div class="tab-pane" id="c">
+          <label>15-418 Final Project</label><br>
+          <label>Kevin Ku</label><br>
+          <label>Stephen Choi</label>
+         </div>
+
+         <div class="tab-pane" id="b">
+         </div>
+
+         <div class="tab-pane active" style="width:85%" id="a">
           
           <!-- Display checkbox -->
           <div class="checkbox">
@@ -140,8 +150,47 @@ echo $formatted_code;
             </code>
           </pre>
 
+
+         <div style="width:30%; position:fixed; top:50px; right:50px">
+
+         <!-- Table displaying color options -->
+         <table class="table" id="color_table">
+          <caption>Color Key</caption>
+          <tr></tr>
+            <td><strong> Lane Usage of Line </strong></td>
+            <td><strong> Color Displayed </strong></td>
+          </tr>
+  
+          <tr>
+            <td> Function Call </td>
+            <td id="color_function"></td> 
+          </tr>
+          <tr>
+ 
+          <td> x < 30% </td>
+            <td id="color_bad"></td> 
+          </tr>
+
+          <tr>
+            <td> 30% <= x <=  70%  </strong></td>
+            <td id="color_okay"></td> 
+          </tr>
+
+          <tr>
+            <td> 70% <= x < 100% </td>
+            <td id="color_optimal"></td> 
+          </tr>
+
+          <tr>
+            <td> x = 100% </td>
+            <td id="color_perfect"></td> 
+          </tr>
+
+          </table>
+
          <!-- Table displaying stats -->
-         <table class="table" id="stat_box" style="display:none; width:20%; position:fixed; top:200px; right:20px">
+         <table class="table" id="stat_box" style="display:none; overflow-y:scroll; height:450px">
+          <caption> Statistics Table </caption>
           <tr></tr>
             <td><strong> Task Number </strong></td>
             <td id="task_value"></td>
@@ -155,16 +204,6 @@ echo $formatted_code;
           <tr></tr>
             <td><strong> Line Text </strong></td>
             <td id="text_value"></td>
-          </tr>
-          
-          <tr></tr>
-            <td><strong> Lane 1 Usage </strong></td>
-            <td id="lane_1"></td>
-          </tr>
-
-          <tr></tr>
-            <td><strong> Lane 2 Usage </strong></td>
-            <td id="lane_2"></td>
           </tr>
           
           <tr></tr>
@@ -183,6 +222,8 @@ echo $formatted_code;
           </tr>
 
           </table>
+
+         </div> 
 
          </div>
 
@@ -204,12 +245,22 @@ echo $formatted_code;
   <script>hljs.initHighlightingOnLoad();</script>
 
   <script type="text/javascript">
+    var file_names = [];
 <?php
   $profile= shell_exec("cat " . $profile_path);
   $profile = str_replace("\"", "\\\"", $profile);
   $profile = str_replace("\n", "", $profile);
   echo "var profile_data = JSON.parse(\"{$profile}\");\n";
   echo "var source_file = \"{$code_name}\";\n";
+  // Create filename array
+  $files = scandir($code_dir);
+  foreach ($files as $f) {
+    if ($f == "." || $f == "..")
+      continue;
+    
+    $file_name = basename($f);
+    echo "file_names.push(\"{$f}\");\n";
+  }
 ?>
 
   // Processing input file TODO: sort by task id, change default task id
@@ -221,7 +272,42 @@ echo $formatted_code;
       profile_data[i]['regions'][j]['region_id'] = j;
     }
   }
-  console.log(profile_data[task_id]['regions']);
+
+  var complete_profile = JSON.parse(JSON.stringify(profile_data));
+  var profile_data_array = new Object();
+
+  // For each file
+  for (i = 0; i < file_names.length; i++) {
+    var copy = JSON.parse(JSON.stringify(profile_data));
+    // For each task
+    for (j = 0; j < copy.length; j++) {
+      // For each region, check whether it's in the deserved file
+      copy[j]['regions'] = copy[j]['regions'].filter(
+      function(x) { 
+        console.log(x.file_name, file_names[i]);
+        return x.file_name == file_names[i]
+      });
+      /*
+      for (k = 0; k < copy[j]['regions'].length; k++) {
+        if (copy[j]['regions'][k]['file_name'] != file_names[i]) {
+          console.log("DELETED", copy[j]['regions'][k]['file_name'],file_names[i]);
+          //delete copy[j]['regions'][k];
+          copy[j]['regions'] = copy[j]['regions'].splice(k,1);
+         }
+      }
+      */
+    }
+  profile_data_array[file_names[i]] = copy;
+  }
+
+  console.log(source_file);
+  profile_data = profile_data_array[source_file];
+  console.log("check this ", profile_data);
+  /*console.log(file_names.length);
+  console.log(file_names);
+  console.log(profile_data_array);
+  console.log(profile_data_array[file_names[1]][1]['regions'].length, profile_data_array[file_names[1]][1]['regions']);
+  */
   </script>
 
   <script type="text/javascript">
@@ -231,10 +317,6 @@ echo $formatted_code;
 <?php
   echo "var profile_name = \"{$profile_name}\";\n";
 ?>
-      var url = "profile.php?task=1&end=10000&start=" + lineNum.toString() + 
-          "&file=" + profile_name;
-      document.getElementById('profile_frame').src = url;
-      
       deselect_all_lines();
 
       search_line(lineNum);
@@ -248,7 +330,8 @@ echo $formatted_code;
   <script type="text/javascript" src="js/visualize.js"> </script>
   <script type="text/javascript">
     //toggle_all();
-    document.getElementById('task_menu').innerHTML = create_task_menu();
+    document.getElementById('task_menu').innerHTML = create_task_menu(); 
+    document.getElementById('b').innerHTML = create_tips();
     document.getElementById('toggle_all').checked=true;
     toggle_all();
   </script>

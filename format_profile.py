@@ -28,9 +28,11 @@ if __name__ == '__main__':
       };
   """
   #print(info)
-  info['regions'].sort(key=lambda x: x['start_line'])
-  for i in xrange(len(info['regions'])):
-    info['regions'][i]['region_id'] = i
+  info.sort(key=lambda x: x['task'])
+  for j in xrange(len(info)): 
+    info[j]['regions'].sort(key=lambda x: x['start_line'])
+    for i in xrange(len(info[j]['regions'])):
+      info[j]['regions'][i]['region_id'] = i
   with open('input2.txt', 'w') as outfile:
       json.dump(info, outfile)
   """

@@ -1,9 +1,13 @@
 /* New tag for each line in the code block. */
-cline {
+newline {
   display:inline;
   margin:0;
   padding:0;
   border:0;
+}
+
+newline:hover {
+  background-color:#66FFFF !important;
 }
 
 cline:hover {
@@ -118,22 +122,46 @@ lane:hover {
 */
 
 
-.selected_line[line_color='yellow'] {
+.selected_line[line_color='undefined'] {
   background-color: yellow;
 }
 
-.selected_line[line_color='black'] {
-  background-color: #00CCFF;
+.selected_line[line_color='no_branch'] {
+  background-color: #FFCCFF;
+}
+
+.selected_line[line_color='bad'] {
+  background-color: #FF7256;
   }
 
-.selected_line[line_color='green'] {
-  background-color: green;
+.selected_line[line_color='okay'] {
+  background-color: #FFFF66;
   }
 
-.selected_line[line_color='red'] {
-  background-color: red;
+.selected_line[line_color='optimal'] {
+  background-color: #58FF58;
+} 
+
+.selected_line[line_color='no_branch_not_function'] {
+  background-color: #FFCCFF;
 } 
 
 .selected_tab {
   background-color: blue;
+}
+
+#color_bad {
+  background-color:#FF7256;
+}
+
+#color_okay {
+  background-color:#FFFF66;
+}
+
+#color_optimal {
+  background-color:#58FF58;;
+}
+
+#color_function {
+  background-color:#FFCCFF;
 }
