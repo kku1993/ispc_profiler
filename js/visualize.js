@@ -6,7 +6,7 @@ function search_line(lineNum) {
       // If it's prior to the first start_line then only highlight the line
       if (i == 0) {
         console.log(lineNum);
-        document.getElementById('line_'+lineNum.toString()).className += "selected_line ";
+        document.getElementById('line_'+lineNum.toString()).className += " selected_line ";
         document.getElementById('line_'+lineNum.toString()).setAttribute('line_color', 'undefined');
         console.log("OWO");
         return;
@@ -24,7 +24,7 @@ function search_line(lineNum) {
       // Case: in between two regions, not in any
         console.log("line 292 else case");
         var chosenLine =  document.getElementById('line_'+lineNum.toString());
-        chosenLine.className += "selected_line ";
+        chosenLine.className += " selected_line ";
         chosenLine.setAttribute('line_color', 'undefined');
         //document.getElementById('line_'+lineNum.toString()).setAttribute('line_color', 'undefined');
         return;
@@ -47,13 +47,13 @@ function search_line(lineNum) {
     }
     // If it's not in the last region, just choose as selected anyway
     var chosenLine =  document.getElementById('line_'+lineNum.toString());
-    chosenLine.className += "selected_line ";
+    chosenLine.className += " selected_line ";
     chosenLine.setAttribute('line_color', 'undefined');
     console.log("not in last region lineNum ->", lineNum);
 }
 
 function highlight_line(region_id, line_number) {  
-  document.getElementById('line_'+line_number.toString()).className += "selected_line ";
+  document.getElementById('line_'+line_number.toString()).className += " selected_line ";
   var my_region = profile_data[task_id]['regions'][region_id];
 
   if ((my_region.region_type == 32) && (my_region.lane_usage.length == 0))  {
@@ -125,7 +125,7 @@ function highlight_line(region_id, line_number) {
       }
       else {
         document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'optimal');
-        console.log('124 optimal');
+        console.log('124 optimal, line_num ->', line_number);
         return;
       }
     }
