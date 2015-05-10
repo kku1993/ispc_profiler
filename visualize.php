@@ -131,11 +131,12 @@
 
          <div class="tab-pane active" style="width:85%" id="a">
           
-          <!-- Display checkbox -->
+          <!-- Display checkbox 
           <div class="checkbox">
             <label><input type="checkbox" id="toggle_all" value="" onclick="toggle_all()"   aria-label="..."> Display Overall Lane Usage  </label>
           </div>
-          
+          -->
+
           <!-- Display source code -->
 <h3>
 <?php
@@ -153,8 +154,11 @@ echo $formatted_code;
 
          <div style="width:30%; position:fixed; top:50px; right:50px">
 
+         <hr><label onclick="toggle_all()"><input type="checkbox" id="toggle_all" value="" onclick="toggle_all()"   aria-label="..."><strong> Display Overall Lane Usage  <strong></label><hr>
+         
          <!-- Table displaying color options -->
          <table class="table" id="color_table">
+          
           <caption>Color Key</caption>
           <tr></tr>
             <td><strong> Lane Usage of Line </strong></td>
@@ -176,6 +180,7 @@ echo $formatted_code;
           </tr>
 
           </table>
+          
 
          <!-- Table displaying stats -->
          <table class="table" id="stat_box" style="display:none; overflow-y:scroll; height:450px">
@@ -308,8 +313,25 @@ echo $formatted_code;
 ?>
       deselect_all_lines();
 
-      search_line(lineNum);
+      var my_regs = profile_data[task_id]['regions'];
+      var reg_num = get_region(lineNum);
+      var reg = my_regs[reg_num];
+      if (reg.region_type == 32) {
 
+        for (var j= reg.start_line; j < reg.end_line; j++) {
+          highlight_line(reg_num, j);
+        }
+        console.log("js");
+        for (var i = 0; i < my_regs.length; i++) {
+          console.log("baloney", i, reg_num, reg.start_line);
+          if ((i != reg_num) && my_regs[i].start_line >= reg.start_line &&  reg.end_line >= my_regs[i].end_line) {
+            search_line(my_regs[i].start_line);
+          }
+        }
+      }
+      else {
+        search_line(lineNum);
+      }
       update_stats(lineNum);
      
       document.getElementById('toggle_all').checked=false;

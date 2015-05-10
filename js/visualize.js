@@ -1,3 +1,13 @@
+function get_region(lineNum) {
+  var regions = profile_data[task_id]['regions'];
+  var latest = -1;
+  for (var i = 0; i < regions.length; i++) {
+    if (regions[i].start_line <= lineNum && lineNum <= regions[i].end_line)
+      latest = i;
+  }
+  return latest;
+}
+
 function search_line(lineNum) {
   console.log("searching");
   for (var i = 0; i < profile_data[task_id]['regions'].length; i++) {
@@ -14,6 +24,8 @@ function search_line(lineNum) {
       // Check each region before, similar to popping off a stack
       for (var region_id = i-1; region_id >= 0; region_id--) {
         if (lineNum <= profile_data[task_id]['regions'][region_id]['end_line']) {
+
+
           for (var j = profile_data[task_id]['regions'][region_id]['start_line']; j < (profile_data[task_id]['regions'][region_id]['end_line']+1); j++) {
               highlight_line(region_id,j);
          } 
@@ -26,7 +38,6 @@ function search_line(lineNum) {
         var chosenLine =  document.getElementById('line_'+lineNum.toString());
         chosenLine.className += " selected_line ";
         chosenLine.setAttribute('line_color', 'undefined');
-        //document.getElementById('line_'+lineNum.toString()).setAttribute('line_color', 'undefined');
         return;
         
     }
@@ -53,6 +64,15 @@ function search_line(lineNum) {
 }
 
 function highlight_line(region_id, line_number) {  
+  /*
+  var our_line = document.getElementById('line_'+line_number.toString());
+  console.log("abc", our_line.innerHTML.indexOf("else")); 
+  if ((our_line.innerHTML.indexOf("else ") != -1) || (our_line.innerHTML).indexOf("if ") > -1) {
+    console.log("RETURNING");
+    our_line.className = "";
+    return;
+  }
+  */
   document.getElementById('line_'+line_number.toString()).className += " selected_line ";
   var my_region = profile_data[task_id]['regions'][region_id];
 
@@ -120,7 +140,8 @@ function highlight_line(region_id, line_number) {
       }
       else if (profile_data[task_id]['regions'][region_id].lane_usage[r].percent < 70) {
         document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'okay');
-        console.log('120 okay');
+        console.log("abc", document.getElementById('line_'+line_number.toString()).innerHTML.indexOf("else")); 
+        console.log('120 okay line# ->', line_number);
         return;
       }
       else {
@@ -133,27 +154,6 @@ function highlight_line(region_id, line_number) {
   console.log("HOW");
 }
   
-
-  /*
-  // If youre fall in the second part of the lane usage
-  else {
-    //console.log("ELSE HAAAAAAAAA");
-    if (profile_data[task_id]['regions'][region_id].lane_usage[1].percent < 30) {       i
-      console.log('line 123 bad');
-      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'bad');
-    }
-    else if (profile_data[task_id]['regions'][region_id].lane_usage[1].percent < 70) {
-      console.log('okay');
-      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'okay');
-    }
-    else {
-      console.log('optimal');
-      document.getElementById('line_'+line_number.toString()).setAttribute('line_color', 'optimal');
-    }
-  }
-  */
-
-
    function deselect_all_lines() {
       var previously_selected = document.getElementsByClassName("selected_line ");
       while (previously_selected.length > 0) {
@@ -172,12 +172,6 @@ function highlight_line(region_id, line_number) {
         console.log("OUR START LINE IS ", profile_data[task_id]['regions'][i].start_line);
         search_line(profile_data[task_id]['regions'][i].start_line);
       }
-    /*
-    var source_code = document.querySelectorAll("[flag=source_code]"); 
-      for (var i = 1; i < source_code.length+1; i++) {   
-        search_line(i);
-      }
-    */
    }
     else {
       deselect_all_lines();
@@ -223,12 +217,7 @@ function update_stats(lineNum) {
           console.log("DAFUQ", my_line);
           while(my_line != null) {
             console.log("WAAAAAAAAAAAT", my_line.parentNode, my_line.parentNode);
-            /*
-            while(my_line2.hasChildNodes()) {
-              console.log("DIEEEEEEE", my_line2.firstChild);
-              my_line2.removeChild(my_line2.firstChild);
-            } 
-            */
+            
             my_line.parentNode.parentNode.removeChild(my_line.parentNode);
             //my_line.parentNode.removeChild(my_line);
             console.log(my_line);
@@ -244,22 +233,6 @@ function update_stats(lineNum) {
             " Lane Usage </strong></td><td>"+my_region['lane_usage'][i]['percent'].toString() +"</td></tr>";
           }
 
-          /*
-          if (my_region['lane_usage'].length == 1) {
-          document.getElementById('lane_1').innerHTML = my_region['lane_usage'][0]['percent'];
-          document.getElementById('lane_2').innerHTML = "N/A";
-          }
-          else if (my_region['lane_usage'].length == 2) { 
-            document.getElementById('lane_1').innerHTML = my_region['lane_usage'][0]['percent']; 
-            document.getElementById('lane_2').innerHTML = my_region['lane_usage'][1]['percent'];
-          }
-          else {
-            document.getElementById('lane_1').innerHTML = "N/A";
-            document.getElementById('lane_2').innerHTML = "N/A";
-            document.getElementById('lane_1_row').style.display = 'none';
-            document.getElementById('lane_1').style.display = 'none';
-          }
-          */
           console.log("line 255 in js"); 
           box.style.display = "block";
           return;
@@ -298,23 +271,6 @@ function update_stats(lineNum) {
           document.getElementById('text_value').innerHTML = document.getElementById('line_'+lineNum.toString()).innerHTML.replace(lineNum.toString(),"").replace('&nbsp;',"");
           document.getElementById('task_value').innerHTML = task_id;
          
-          /* 
-          var my_line = document.getElementById('lane_0');
-          var index = 0;
-          console.log("DAFUQ");
-          while(my_line != null) {
-            console.log("WAAAAAAAAAAAT");
-            document.getElementById('stat_box').removeChild(my_line);
-            index++;
-            my_line = document.getElementById('lane_'+index.toString());
-          }
-          for (var i = 0; i < my_region['lane_usage'].length; i++) { 
-            document.getElementById('stat_box').innerHTML += 
-            "<tr></tr> <td ><strong> Branch "+ i.toString() +
-            " Lane Usage </strong></td><td id='lane_1'>"+my_region['lane_usage'][i]['percent'] +"</td></tr>";
-          }
-          */          
-
           var my_line = document.getElementById('wrapper_lane_0');
           //var my_line2 = document.getElementById('lane_0');
           var index = 0;
